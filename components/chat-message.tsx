@@ -5,13 +5,15 @@ import remarkGfm from "remark-gfm"
 import { Message } from "@/lib/chat-data"
 import { cn } from "@/lib/utils"
 import { CSSProperties } from "react"
+import { FileText } from "lucide-react"
 
 interface ChatMessageProps {
   message: Message
   style?: CSSProperties
+  onSourceClick?: (noteTitle: string) => void
 }
 
-export function ChatMessage({ message, style }: ChatMessageProps) {
+export function ChatMessage({ message, style, onSourceClick }: ChatMessageProps) {
   const isUser = message.role === "user"
 
   return (
@@ -50,16 +52,18 @@ export function ChatMessage({ message, style }: ChatMessageProps) {
           </div>
         )}
         
-        {/* Source Pills - Minimal style */}
+        {/* Clickable Source Pills */}
         {message.sources && message.sources.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-4">
             {message.sources.map((source, index) => (
-              <span
+              <button
                 key={index}
-                className="inline-flex items-center px-2.5 py-1 text-xs rounded-full bg-secondary/80 text-muted-foreground"
+                onClick={() => onSourceClick?.(source)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full bg-secondary/80 text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors cursor-pointer"
               >
+                <FileText className="h-3 w-3" />
                 {source}
-              </span>
+              </button>
             ))}
           </div>
         )}

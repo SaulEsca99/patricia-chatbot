@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { ChatInput } from "@/components/chat-input"
 import { ChatMessage } from "@/components/chat-message"
 import { TypingIndicator } from "@/components/typing-indicator"
@@ -19,6 +18,7 @@ interface ChatViewProps {
   onToggleSources: () => void
   showSources: boolean
   messagesEndRef: RefObject<HTMLDivElement | null>
+  onSourceClick?: (noteTitle: string) => void
 }
 
 export function ChatView({
@@ -31,11 +31,12 @@ export function ChatView({
   onToggleSources,
   showSources,
   messagesEndRef,
+  onSourceClick,
 }: ChatViewProps) {
   return (
-    <div className="flex flex-1 flex-col h-full">
+    <div className="flex flex-1 flex-col h-full min-h-0">
       {/* Minimal Header */}
-      <header className="flex items-center justify-between px-4 md:px-6 h-14 border-b border-border/50">
+      <header className="flex items-center justify-between px-4 md:px-6 h-14 border-b border-border/50 shrink-0">
         <div className="flex items-center gap-3">
           <img 
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/compucom_logo%20%281%29-jl9k4W2pjdKreOaQBitkC3T0ORphL0.png"
@@ -67,23 +68,24 @@ export function ChatView({
         </div>
       </header>
 
-      {/* Messages */}
-      <ScrollArea className="flex-1">
+      {/* Messages — native scroll */}
+      <div className="flex-1 overflow-y-auto min-h-0">
         <div className="max-w-2xl mx-auto px-4 md:px-6 py-8 space-y-6">
           {messages.map((message, index) => (
             <ChatMessage 
               key={message.id} 
               message={message} 
               style={{ animationDelay: `${index * 0.05}s` }}
+              onSourceClick={onSourceClick}
             />
           ))}
           {isTyping && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Input */}
-      <div className="border-t border-border/50 px-4 md:px-6 py-4">
+      <div className="border-t border-border/50 px-4 md:px-6 py-4 shrink-0">
         <div className="max-w-2xl mx-auto">
           <ChatInput
             value={inputValue}
@@ -96,3 +98,4 @@ export function ChatView({
     </div>
   )
 }
+

@@ -5,13 +5,15 @@ import { Message, suggestionCards } from "@/lib/chat-data"
 import { WelcomeScreen } from "@/components/welcome-screen"
 import { ChatView } from "@/components/chat-view"
 import { SourcesPanel } from "@/components/sources-panel"
+import { NoteViewer } from "@/components/note-viewer"
 
-export default function CompuComBrainPage() {
+export default function PatriciaPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [showSources, setShowSources] = useState(false)
   const [hasStartedChat, setHasStartedChat] = useState(false)
+  const [viewingNote, setViewingNote] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = useCallback(() => {
@@ -82,9 +84,13 @@ export default function CompuComBrainPage() {
     setShowSources(false)
   }, [])
 
+  const handleSourceClick = useCallback((noteTitle: string) => {
+    setViewingNote(noteTitle)
+  }, [])
+
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-background">
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col min-h-0">
         {!hasStartedChat ? (
           <WelcomeScreen
             suggestions={suggestionCards}
@@ -104,6 +110,7 @@ export default function CompuComBrainPage() {
             onToggleSources={() => setShowSources(!showSources)}
             showSources={showSources}
             messagesEndRef={messagesEndRef}
+            onSourceClick={handleSourceClick}
           />
         )}
       </div>
@@ -111,6 +118,12 @@ export default function CompuComBrainPage() {
       <SourcesPanel 
         isOpen={showSources} 
         onClose={() => setShowSources(false)} 
+      />
+
+      {/* Full documentation viewer */}
+      <NoteViewer
+        noteTitle={viewingNote}
+        onClose={() => setViewingNote(null)}
       />
     </div>
   )

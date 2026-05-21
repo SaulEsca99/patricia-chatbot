@@ -71,6 +71,9 @@ function chunkNote(noteTitle: string, content: string, system: string): Knowledg
 
     if (text.length < 20) continue
 
+    // Skip navigation-only sections
+    if (/^(See Also|Ver También|Related|Links)/i.test(sectionTitle)) continue
+
     const fullText = `## ${sectionTitle}\n${text}`
     chunks.push({
       id: `${noteTitle}__${sectionTitle.toLowerCase().replace(/\s+/g, '_')}`,
