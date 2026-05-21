@@ -10,10 +10,17 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Patricia — CompuCom PAT Assistant",
   description: "AI-powered knowledge assistant for CompuCom's Product Assistance Team",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-dark-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-icon.png",
+  },
 }
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#0a0a0f",
 }
 
 export default function RootLayout({
