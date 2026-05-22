@@ -35,16 +35,20 @@ export function ChatView({
 }: ChatViewProps) {
   return (
     <div className="flex flex-1 flex-col h-full min-h-0">
-      {/* Minimal Header */}
+      {/* Header */}
       <header className="flex items-center justify-between px-4 md:px-6 h-14 border-b border-border/50 shrink-0">
-        <div className="flex items-center gap-3">
+        {/* Logo — click to go home */}
+        <button
+          onClick={onNewChat}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+        >
           <img 
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/compucom_logo%20%281%29-jl9k4W2pjdKreOaQBitkC3T0ORphL0.png"
             alt="CompuCom"
             className="w-8 h-8"
           />
           <span className="text-sm font-semibold text-foreground">Patricia</span>
-        </div>
+        </button>
         
         <div className="flex items-center gap-1">
           <Button
@@ -84,9 +88,9 @@ export function ChatView({
         </div>
       </div>
 
-      {/* Input */}
+      {/* Input — centered */}
       <div className="border-t border-border/50 px-4 md:px-6 py-4 shrink-0">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-xl mx-auto">
           <ChatInput
             value={inputValue}
             onChange={onInputChange}
@@ -98,4 +102,3 @@ export function ChatView({
     </div>
   )
 }
-

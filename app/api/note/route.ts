@@ -16,7 +16,11 @@ export async function GET(request: NextRequest) {
   const titleLower = title.toLowerCase()
   const match = files.find(f => {
     const name = f.replace('.md', '').toLowerCase()
-    return name.includes(titleLower) || titleLower.split(' ').every(word => name.includes(word.toLowerCase()))
+    // Try exact contains first
+    if (name.includes(titleLower)) return true
+    // Then try all words match
+    const words = titleLower.split(/[\s\-]+/).filter(w => w.length > 2)
+    return words.every(word => name.includes(word))
   })
 
   if (!match) {
@@ -25,10 +29,15 @@ export async function GET(request: NextRequest) {
 
   let content = fs.readFileSync(path.join(vaultDir, match), 'utf-8')
   
-  // Clean up for display — remove image embeds but keep the rest readable
+  // Clean up for display
   content = content
-    .replace(/!\[\[assets\/[^\]]+\]\]/g, '*[Image]*')
+    // Remove Obsidian image embeds entirely (they can't be served from vault)
+    .replace(/!\[\[assets\/[^\]]+\]\]/g, '')
+    // Resolve wikilinks to bold text
     .replace(/\[\[([^\]|]+)\|?([^\]]*)\]\]/g, (_, link, alias) => `**${alias || link}**`)
+    // Remove empty lines left by image removal
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 
   return NextResponse.json({ content, filename: match })
 }

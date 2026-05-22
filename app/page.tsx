@@ -98,6 +98,7 @@ export default function PatriciaPage() {
             inputValue={inputValue}
             onInputChange={setInputValue}
             onSend={() => handleSendMessage()}
+            onToggleSources={() => setShowSources(!showSources)}
           />
         ) : (
           <ChatView
@@ -117,7 +118,8 @@ export default function PatriciaPage() {
       
       <SourcesPanel 
         isOpen={showSources} 
-        onClose={() => setShowSources(false)} 
+        onClose={() => setShowSources(false)}
+        onSourceClick={handleSourceClick}
       />
 
       {/* Full documentation viewer */}

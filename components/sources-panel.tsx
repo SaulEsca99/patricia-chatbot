@@ -2,16 +2,26 @@
 
 import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { knowledgeSources } from "@/lib/chat-data"
 import { cn } from "@/lib/utils"
 
 interface SourcesPanelProps {
   isOpen: boolean
   onClose: () => void
+  onSourceClick?: (noteTitle: string) => void
 }
 
-export function SourcesPanel({ isOpen, onClose }: SourcesPanelProps) {
+export function SourcesPanel({ isOpen, onClose, onSourceClick }: SourcesPanelProps) {
+  // Map item names to full note titles for the API
+  function buildNoteTitle(systemName: string, itemName: string): string {
+    if (itemName === 'Overview') return `${systemName} - Overview`
+    if (itemName === 'Glossary') return 'Glossary'
+    if (itemName === 'Contacts') return 'Team Contacts'
+    if (itemName === 'Cheatsheet') return 'Cheatsheet'
+    if (itemName === 'Access Requests') return 'Access Requests'
+    return `${systemName} - ${itemName}`
+  }
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -30,7 +40,7 @@ export function SourcesPanel({ isOpen, onClose }: SourcesPanelProps) {
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 h-14 border-b border-border/50">
+        <div className="flex items-center justify-between px-5 h-14 border-b border-border/50 shrink-0">
           <h2 className="text-sm font-medium text-foreground">Sources</h2>
           <Button
             variant="ghost"
@@ -43,28 +53,27 @@ export function SourcesPanel({ isOpen, onClose }: SourcesPanelProps) {
           </Button>
         </div>
 
-        {/* Content */}
-        <ScrollArea className="flex-1">
-          <div className="p-4 space-y-6">
-            {knowledgeSources.map((source) => (
-              <div key={source.id}>
-                <h3 className="text-xs font-medium uppercase tracking-wider text-primary/80 mb-3 px-1">
-                  {source.name}
-                </h3>
-                <div className="space-y-0.5">
-                  {source.items.map((item) => (
-                    <button
-                      key={item.id}
-                      className="w-full text-left px-3 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-primary/10 rounded-lg transition-colors"
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                </div>
+        {/* Content — native scroll */}
+        <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-6">
+          {knowledgeSources.map((source) => (
+            <div key={source.id}>
+              <h3 className="text-xs font-medium uppercase tracking-wider text-primary/80 mb-3 px-1">
+                {source.icon} {source.name}
+              </h3>
+              <div className="space-y-0.5">
+                {source.items.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => onSourceClick?.(buildNoteTitle(source.name, item.name))}
+                    className="w-full text-left px-3 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
+                  >
+                    {item.name}
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   )
