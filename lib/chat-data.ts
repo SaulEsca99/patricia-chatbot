@@ -26,10 +26,13 @@ export const knowledgeSources: KnowledgeSource[] = [
       { id: 'dims-installation', name: 'Installation' },
       { id: 'dims-commands', name: 'Commands' },
       { id: 'dims-order-types', name: 'Order Types' },
+      { id: 'dims-status-codes', name: 'Status Codes' },
       { id: 'dims-electronic-hold', name: 'Electronic Hold' },
       { id: 'dims-kill-user', name: 'Kill User' },
       { id: 'dims-change-order-status', name: 'Change Order Status' },
       { id: 'dims-account-profile', name: 'Account Profile' },
+      { id: 'dims-update-via-codes', name: 'Update VIA Codes' },
+      { id: 'dims-remove-environment-sku', name: 'Remove Environment SKU' },
     ],
   },
   {
@@ -64,6 +67,8 @@ export const knowledgeSources: KnowledgeSource[] = [
       { id: 'pat-create-price-rule', name: 'Create Price Rule' },
       { id: 'pat-remove-sku', name: 'Remove SKU' },
       { id: 'pat-update-skus', name: 'Update SKUs' },
+      { id: 'pat-add-valid-sales', name: 'Add Valid Sales' },
+      { id: 'pat-new-user', name: 'New User' },
     ],
   },
   {
