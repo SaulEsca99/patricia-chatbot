@@ -33,7 +33,7 @@ export function ChatInput({
   }
 
   return (
-    <div className="relative flex items-center gap-3 rounded-2xl bg-card border border-border px-4 py-3 focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all shadow-lg shadow-black/20">
+    <div className="relative flex items-center gap-3 rounded-2xl bg-card border border-border px-4 py-2.5 focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all shadow-lg shadow-black/20">
       <textarea
         ref={textareaRef}
         value={value}
@@ -41,7 +41,7 @@ export function ChatInput({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={1}
-        className="flex-1 resize-none bg-transparent text-foreground placeholder:text-muted-foreground/60 focus:outline-none text-sm leading-normal min-h-[24px] max-h-[160px]"
+        className="flex-1 resize-none bg-transparent text-foreground placeholder:text-muted-foreground/60 focus:outline-none text-sm min-h-[36px] max-h-[160px] py-[6px] leading-[24px]"
       />
       <button
         onClick={onSend}
