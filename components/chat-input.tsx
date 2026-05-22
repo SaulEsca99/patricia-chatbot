@@ -33,7 +33,7 @@ export function ChatInput({
   }
 
   return (
-    <div className="relative flex items-end gap-3 rounded-2xl bg-card border border-border p-4 focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all shadow-lg shadow-black/20">
+    <div className="relative flex items-center gap-3 rounded-2xl bg-card border border-border px-4 py-3 focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all shadow-lg shadow-black/20">
       <textarea
         ref={textareaRef}
         value={value}
@@ -41,14 +41,14 @@ export function ChatInput({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={1}
-        className="flex-1 resize-none bg-transparent text-foreground placeholder:text-muted-foreground/60 focus:outline-none text-base leading-relaxed min-h-[28px] max-h-[160px] py-0.5"
+        className="flex-1 resize-none bg-transparent text-foreground placeholder:text-muted-foreground/60 focus:outline-none text-sm leading-normal min-h-[24px] max-h-[160px]"
       />
       <button
         onClick={onSend}
         disabled={!value.trim()}
-        className="flex items-center justify-center h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-primary to-accent text-white disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-95 transition-all shadow-md"
+        className="flex items-center justify-center h-9 w-9 shrink-0 rounded-xl bg-gradient-to-br from-primary to-accent text-white disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-95 transition-all shadow-md"
       >
-        <ArrowUp className="h-5 w-5" />
+        <ArrowUp className="h-4 w-4" />
         <span className="sr-only">Send</span>
       </button>
     </div>
