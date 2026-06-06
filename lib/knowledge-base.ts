@@ -95,13 +95,32 @@ export function loadVault(): KnowledgeChunk[] {
   if (cachedChunks) return cachedChunks
 
   const vaultDir = path.join(process.cwd(), 'data', 'vault')
-  
+
   if (!fs.existsSync(vaultDir)) {
     console.error('Vault directory not found:', vaultDir)
     return []
   }
 
-  const files = fs.readdirSync(vaultDir).filter(f => f.endsWith('.md'))
+  // Filter out internal/meta documentation from search index
+  const files = fs.readdirSync(vaultDir)
+    .filter(f => f.endsWith('.md'))
+    .filter(f => {
+      // Exclude internal documentation patterns
+      const excludePatterns = [
+        'AI-AGENT-CONTEXT',
+        'CLAUDE',
+        'README',
+        /^_/  // Files starting with underscore
+      ]
+      return !excludePatterns.some(pattern => {
+        if (pattern instanceof RegExp) {
+          return pattern.test(f)
+        }
+        return f.includes(pattern)
+      })
+    })
+
+  console.log(`[Patricia] Loading ${files.length} user-facing documentation files`)
   const allChunks: KnowledgeChunk[] = []
 
   for (const file of files) {
