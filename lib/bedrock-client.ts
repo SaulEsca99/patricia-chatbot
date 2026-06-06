@@ -42,20 +42,25 @@ function getBedrockClient(): BedrockRuntimeClient {
 
 // Clean markdown tables and formatting from content
 function cleanSourceContent(content: string): string {
-  return content
-    // Remove markdown tables completely
-    .replace(/\|[^\n]+\|\n\|[-:\s|]+\|\n(\|[^\n]+\|\n)*/g, '[TABLE REMOVED - Describe this information naturally in prose]\n')
-    // Remove single-line table headers that didn't match full pattern
-    .replace(/\|[^\n]+\|/g, '')
-    // Remove extra pipes
-    .replace(/\|\|+/g, '')
-    // Remove horizontal rules
-    .replace(/^-{3,}$/gm, '')
-    // Remove emoji prefixes from headers
-    .replace(/^(#+\s*)[⚙️💼🛒🔧📋📖👥🔐⚡🏠]+\s*/gm, '$1')
-    // Collapse multiple blank lines
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
+  let cleaned = content
+
+  // AGGRESSIVE table removal - remove ANY line containing pipes
+  // This is nuclear but effective: if a line has |, it's probably a table
+  cleaned = cleaned.replace(/^.*\|.*$/gm, '')
+
+  // Remove horizontal rules (---)
+  cleaned = cleaned.replace(/^-{3,}$/gm, '')
+
+  // Remove emoji prefixes from headers
+  cleaned = cleaned.replace(/^(#+\s*)[⚙️💼🛒🔧📋📖👥🔐⚡🏠]+\s*/gm, '$1')
+
+  // Collapse multiple blank lines
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n')
+
+  // Remove leading/trailing whitespace
+  cleaned = cleaned.trim()
+
+  return cleaned
 }
 
 // Build system prompt with RAG context from vault chunks
@@ -63,7 +68,21 @@ function buildSystemPrompt(chunks: KnowledgeChunk[]): string {
   const sourcesContext = chunks
     .map((chunk, index) => {
       // Clean the content before adding to prompt
+      const originalHasPipes = chunk.content.includes('|')
       const cleanedContent = cleanSourceContent(chunk.content)
+      const cleanedHasPipes = cleanedContent.includes('|')
+
+      // DEBUG: Log cleaning results
+      console.log(`[Patricia] Chunk: ${chunk.noteTitle} - ${chunk.section}`)
+      console.log(`[Patricia]   Original length: ${chunk.content.length}, Has pipes: ${originalHasPipes}`)
+      console.log(`[Patricia]   Cleaned length: ${cleanedContent.length}, Has pipes: ${cleanedHasPipes}`)
+
+      if (cleanedHasPipes) {
+        console.error('[ERROR] Tables STILL present after cleaning!')
+        console.error('Original:', chunk.content.substring(0, 300))
+        console.error('Cleaned:', cleanedContent.substring(0, 300))
+      }
+
       return `[Source ${index + 1}: ${chunk.noteTitle} - ${chunk.section}]
 ${cleanedContent}`
     })
