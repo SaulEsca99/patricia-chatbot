@@ -342,7 +342,60 @@ When the user exports from Notion, the export creates:
 
 ---
 
-## 10. Rules You Must Follow
+## 10. Which Repo to Start Working In
+
+> **Ask the user what they want to do first. Then use this guide to decide where to start.**
+
+This is the most common decision you will make. Use this table:
+
+| Task | Start in | Then |
+|---|---|---|
+| Add or update documentation | `Compucom-Brain` (vault) | Sync to `patricia-chatbot` |
+| Fix a bug in the UI / chatbot | `patricia-chatbot` only | No vault change needed |
+| Add a new feature to Patricia | `patricia-chatbot` only | No vault change needed |
+| Integrate credentials / environment variables | `patricia-chatbot` only | No vault change needed |
+| Import content from Notion export | `Compucom-Brain` first | Sync to `patricia-chatbot` |
+| Update navigation in the sources panel | `patricia-chatbot` → `lib/chat-data.ts` | No vault change needed |
+
+---
+
+### The Golden Rule
+
+```
+Documentation changes → always start in Compucom-Brain
+Code / UI changes     → always start in patricia-chatbot
+```
+
+**Why?**
+- `Compucom-Brain` is the **source of truth** for all content. Patricia only holds copies.
+- If you edit content directly in Patricia and forget to copy it back to the vault, that change is lost the next time the vault is synced.
+- If you edit vault notes but forget to sync to Patricia, the chatbot will give outdated answers.
+
+---
+
+### Correct Workflow: Adding Documentation
+
+```
+1. Create/edit note in Compucom-Brain (Obsidian vault)
+2. git add + commit + push  →  SaulEsca99/Compucom-Brain
+3. cp note → compu-com-brain-app/data/vault/
+4. cp images → compu-com-brain-app/public/assets/
+5. Update lib/chat-data.ts (add new source to navigation)
+6. git add + commit + push  →  SaulEsca99/patricia-chatbot
+```
+
+### Correct Workflow: Code / Feature Work
+
+```
+1. Edit files in compu-com-brain-app/
+2. Test locally: npm run dev
+3. git add + commit + push  →  SaulEsca99/patricia-chatbot
+   (Vercel auto-deploys in ~1 min)
+```
+
+---
+
+## 11. Rules You Must Follow
 
 1. **Always update both repos** when adding notes — never just one
 2. **Never use AI filler text** — write documentation like an experienced coworker
@@ -353,6 +406,7 @@ When the user exports from Notion, the export creates:
 7. **Commit messages** should be descriptive: `feat:`, `fix:`, `docs:` prefixes
 8. **Don't break existing notes** — read before editing
 9. **Content language is English** (the `main` branch)
+10. **Read this file completely before starting any task** — don't assume, verify
 
 ---
 
