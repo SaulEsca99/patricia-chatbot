@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchVault, loadVault } from '@/lib/knowledge-base'
+import { generateAnswerWithBedrock, isBedrockConfigured, type ConversationMessage } from '@/lib/bedrock-client'
 
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json()
+    const { message, conversationHistory } = await request.json()
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
     }
 
-    // Search the vault for relevant chunks
+    // STEP 1: Retrieval - Search the vault for relevant chunks (TF-IDF always runs)
     const results = searchVault(message, 8)
 
     if (results.length === 0) {
@@ -22,8 +23,35 @@ export async function POST(request: NextRequest) {
     // Extract unique source notes
     const sources = [...new Set(results.map(r => r.noteTitle))]
 
-    // Build intelligent answer
-    const answer = buildIntelligentAnswer(message, results)
+    // STEP 2: Generation - Use LLM if configured, otherwise fall back to template
+    let answer: string
+
+    const useLLM = process.env.USE_LLM === 'true'
+    const bedrockConfigured = isBedrockConfigured()
+
+    if (useLLM && bedrockConfigured) {
+      try {
+        // LLM-powered answer with conversation context
+        console.log('[Patricia] Using Bedrock Claude for answer generation')
+        answer = await generateAnswerWithBedrock(
+          message,
+          results,
+          (conversationHistory as ConversationMessage[]) || []
+        )
+      } catch (bedrockError) {
+        // Graceful fallback to TF-IDF template on any error
+        console.warn('[Patricia] Bedrock failed, falling back to TF-IDF template:', bedrockError)
+        answer = buildIntelligentAnswer(message, results)
+      }
+    } else {
+      // Fallback to template-based answer (original logic)
+      if (!useLLM) {
+        console.log('[Patricia] USE_LLM=false, using TF-IDF template')
+      } else if (!bedrockConfigured) {
+        console.log('[Patricia] Bedrock not configured, using TF-IDF template')
+      }
+      answer = buildIntelligentAnswer(message, results)
+    }
 
     return NextResponse.json({ answer, sources })
   } catch (error) {

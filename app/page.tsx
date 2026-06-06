@@ -7,8 +7,16 @@ import { ChatView } from "@/components/chat-view"
 import { SourcesPanel } from "@/components/sources-panel"
 import { NoteViewer } from "@/components/note-viewer"
 
+// Conversation history type for LLM context
+interface ConversationMessage {
+  role: 'user' | 'assistant'
+  content: string
+  sources?: string[]
+}
+
 export default function PatriciaPage() {
   const [messages, setMessages] = useState<Message[]>([])
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([])
   const [inputValue, setInputValue] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [showSources, setShowSources] = useState(false)
@@ -40,13 +48,21 @@ export default function PatriciaPage() {
     setHasStartedChat(true)
     setIsTyping(true)
 
+    // Add user message to conversation history for LLM context
+    const newUserHistoryMessage: ConversationMessage = {
+      role: 'user',
+      content: text,
+    }
+    const updatedHistory = [...conversationHistory, newUserHistoryMessage]
+    setConversationHistory(updatedHistory)
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
-          history: messages.map(m => ({ role: m.role, content: m.content })),
+          conversationHistory: updatedHistory.slice(-10), // Last 5 turns (10 messages)
         }),
       })
 
@@ -60,6 +76,13 @@ export default function PatriciaPage() {
         timestamp: new Date(),
       }
       setMessages(prev => [...prev, botMessage])
+
+      // Add assistant response to conversation history
+      setConversationHistory(prev => [...prev, {
+        role: 'assistant',
+        content: data.answer || 'Sorry, I could not find an answer.',
+        sources: data.sources,
+      }])
     } catch {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -71,7 +94,7 @@ export default function PatriciaPage() {
     } finally {
       setIsTyping(false)
     }
-  }, [inputValue, messages])
+  }, [inputValue, conversationHistory])
 
   const handleSuggestionClick = useCallback((text: string) => {
     handleSendMessage(text)
@@ -79,6 +102,7 @@ export default function PatriciaPage() {
 
   const handleNewChat = useCallback(() => {
     setMessages([])
+    setConversationHistory([]) // Clear ephemeral conversation memory
     setHasStartedChat(false)
     setInputValue("")
     setShowSources(false)
